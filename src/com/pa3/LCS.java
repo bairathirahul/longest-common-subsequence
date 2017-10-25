@@ -6,6 +6,8 @@
 
 package com.pa3;
 
+import java.io.*;
+
 public class LCS {
     private static final int DIAGONAL = 0;
     private static final int UP = 1;
@@ -77,6 +79,73 @@ public class LCS {
     }
 
     public static void main(String[] args) {
-        System.out.println(getLCS("ABCBDAB", "BDCABA"));
+        // 1. Check if 2 command line parameters are provided
+        if(args.length < 2) {
+            System.out.println("Please specify input and output file names.\nFor example: java LCS input.txt output.text");
+            System.exit(1);
+        }
+
+        // 2. Check if the input file exists and is readable
+        FileInputStream iFileStream = null;
+        try {
+            iFileStream = new FileInputStream(args[0]);
+        } catch(FileNotFoundException e) {
+            System.out.println("Error: The input file " + args[0] + " cannot be read. Please provide a valid filename");
+            System.exit(1);
+        }
+
+        // 3. Check if output file is writable
+        FileOutputStream oFileStream = null;
+        try {
+            oFileStream = new FileOutputStream(args[1]);
+        } catch(FileNotFoundException e) {
+            System.out.println("Error: The output file" + args[1] + ", is not writable. Please verify that you have the correct permission, or there is no folder with the same name");
+            System.exit(1);
+        }
+
+        // 4. Initialize stream reader and writer
+        DataInputStream iStream = new DataInputStream(iFileStream);
+        BufferedReader bReader = new BufferedReader(new InputStreamReader(iStream));
+        DataOutputStream oStream = new DataOutputStream(oFileStream);
+        BufferedWriter bWriter = new BufferedWriter(new OutputStreamWriter(oStream));
+
+        // 5. Read input line from the file and perform insertion sort
+        String cLine = null;
+        String pLine = null;
+        try {
+            while((cLine = bReader.readLine()) != null) {
+                // Skip empty lines
+                if(cLine.trim().length() == 0) {
+                    continue;
+                }
+
+                if(pLine == null) {
+                    pLine = cLine;
+                } else {
+                    String lcs = getLCS(pLine, cLine);
+                    String output = "-----------------------------------\n" +
+                            "The DNA Strands:\n\t" + pLine + "\n\t" + cLine +
+                            "\nLCS is " + lcs  + "\nLCS length is " + lcs.length();
+                    bWriter.write(output);
+                    pLine = null;
+                }
+                bWriter.newLine();
+            }
+            System.out.println("Success: All done!");
+        } catch(IOException ex) {
+            System.out.println("Error: Unexpected IO error has occurred. Please try again");
+        } finally {
+            // 6. Release resources
+            try {
+                bWriter.close();
+                oStream.close();
+                oFileStream.close();
+                bReader.close();
+                iStream.close();
+                iFileStream.close();
+            } catch(IOException ex) {
+                System.out.println("Error: Unexpected IO error has occurred. Please try again");
+            }
+        }
     }
 }
