@@ -1,0 +1,11 @@
+##### Description:
+Read from a file of DNA strands, measure their similarities by finding LCS length, and printing LCS.
+##### Algorithm:
+- Step
+##### Compiler:
+- Java
+##### Platform:
+- MacOS/Sublime Text 3
+##### What works and/or fails:
+- LCS works. Nothing seems to fail.
+##### Data Structure Design:

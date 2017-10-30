@@ -4,7 +4,6 @@
     Team Members: Justin Toler, Rahul Bairathi, Shubhra Mishra
  */
 
-package com.pa3;
 
 import java.io.*;
 
@@ -81,7 +80,7 @@ public class LCS {
     public static void main(String[] args) {
         // 1. Check if 2 command line parameters are provided
         if(args.length < 2) {
-            System.out.println("Please specify input and output file names.\nFor example: java LCS input.txt output.text");
+            System.out.println("Please specify input and output file names.\nFor example: java LCS input.txt output.txt");
             System.exit(1);
         }
 
