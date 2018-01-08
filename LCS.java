@@ -1,47 +1,18 @@
-/*
-    Programming Assignment 3
-    Title: Longest Common Subsequence
-    Team Members: Justin Toler, Rahul Bairathi, Shubhra Mishra
-
-    README file for LCS implementation for Programming Assignment 3
-Team Members: Justin Toler, Rahul Bairathi, Shubhra Mishra
-
-Running time of this algorithm is O(mn) in the worst case.
-
-1) Compiler used is Java development toolkit (JDK)
-
-2) IDE used: IntelliJ
-
-3) Array is used to store the various data types. No other datastructure is used.
-
-4) The program is divided into three parts:
-    i) reading the contents of input file
-    ii) determining the subsequence of the strings through LCS algorithm
-    iii) Calculating the performance of the code for the given input file
-    iv) Writing the generated subsequences and the computed performance analysis to the output file array
-    
-5) Key functions used:
-    i) We first initialize arrays to store sub-sequence lengths
-    ii)Secondly, we determine the index for sub-sequence array
-    iii)Then, we initialize the sub-sequence array.
-    iv) Finally, we generate the sub-sequences for the given input file
-    
-6) What works in this implementation:
-    i) The program successfully reads the input file in the format mentioned in the assignment.
-    ii) The program successfully generates sub-sequences and computes performance for any input file.
-    iii) The program successfully writes the contents of the final output to the output file that is specified.
-    iv) Program is capable of handling any dirty data by exiting gracefully and not throwing any error.
-    
-7) What might not work:
-    i)The program might run for extremely long time or may hang if the input is extremely large because the running time of LCS algorithm is O(mn). Although, for such case the program handles and exits efficiently and also is able to continue with other inputs elegantly.
- */
-
 import java.io.*;
+import java.util.regex.Pattern;
 
 public class LCS {
+    /*
+     * Direction constants for LCS in direction matrix
+     */
     private static final int DIAGONAL = 0;
     private static final int UP = 1;
     private static final int LEFT = 2;
+
+    /*
+     * Regular expression to check validity of DNA strand
+     */
+    private static final String REGEX_STRAND = "^[A|C|G|T]+$";
 
     /**
      * Returns longest common subsequence of input strings
@@ -117,15 +88,21 @@ public class LCS {
         }
     }
 
+    /**
+     * Entry point of the program that reads the input file, calls getLCS function
+     * and writes output to the output file
+     *
+     * @param args Command line arguments
+     */
     public static void main(String[] args) {
-        // 1. Check if 2 command line parameters are provided
+        // Validate command line parameters
         if(args.length < 2) {
             System.out.println("Please specify input and output file names.\n" + 
                 "For example: java LCS input.txt output.txt");
             System.exit(1);
         }
 
-        // 2. Check if the input file exists and is readable
+        // Validate the availability of input file
         FileInputStream iFileStream = null;
         try {
             iFileStream = new FileInputStream(args[0]);
@@ -135,7 +112,7 @@ public class LCS {
             System.exit(1);
         }
 
-        // 3. Check if output file is writable
+        // Validate writeability of output file
         FileOutputStream oFileStream = null;
         try {
             oFileStream = new FileOutputStream(args[1]);
@@ -146,24 +123,36 @@ public class LCS {
             System.exit(1);
         }
 
-        // 4. Initialize stream reader and writer
+        // Initialize stream readers and writers
         DataInputStream iStream = new DataInputStream(iFileStream);
         BufferedReader bReader = new BufferedReader(new InputStreamReader(iStream));
         DataOutputStream oStream = new DataOutputStream(oFileStream);
         BufferedWriter bWriter = new BufferedWriter(new OutputStreamWriter(oStream));
 
-        // 5. Read input line from the file and perform insertion sort
-        long beginTime = System.currentTimeMillis();// Begin time of execution
-        String cLine = null;                        // Current line
-        String pLine = null;                        // Previous Line
-        String output = null;                       // Output
-        boolean emptyInput = true;                  // Think input file is empty
+        // Initialize other auxillary variables and objects
+        long beginTime = System.currentTimeMillis();        // Begin time of execution
+        String cLine = null;                                // Current line
+        String pLine = null;                                // Previous Line
+        String output = null;                               // Output
+        boolean emptyInput = true;                          // Flag for empty input file
+        boolean invalidInput = false;                       // Flag for invalid input
+        Pattern validator = Pattern.compile(REGEX_STRAND);  // Validator for input strings
+        int lineNo = 0;                                     // Line number in file
 
         try {
             while((cLine = bReader.readLine()) != null) {
+                // Increment line number
+                lineNo++;
+
                 // Skip empty lines
                 if(cLine.trim().length() == 0) {
                     continue;
+                }
+
+                // Validate input line
+                if(!validator.matcher(cLine).matches()) {
+                    invalidInput = true;
+                    break;
                 }
 
                 if(pLine == null) {
@@ -184,8 +173,11 @@ public class LCS {
                 bWriter.newLine();
             }
 
-            if(emptyInput) {
-                // If there were no valid lines in the file
+            if(invalidInput) {
+                // Input was invalid
+                System.out.println("Error: The string at line " + lineNo + " is invalid. Please fix the input and try again");
+            } else if(emptyInput) {
+                // There was only one line or no lines in input file
                 System.out.println("Error: The input file was empty or contained only one line.");
             } else {
                 long executionTime = (System.currentTimeMillis() - beginTime) / 1000;
